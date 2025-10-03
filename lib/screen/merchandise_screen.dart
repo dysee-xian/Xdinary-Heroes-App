@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../models/merchandise.dart';
+import '../models/merchandise.dart';
+import '../models/cart_item.dart';
+import 'cart_screen.dart';
 import 'info_screen.dart';
 
 class MerchandiseScreen extends StatefulWidget {
@@ -11,6 +13,20 @@ class MerchandiseScreen extends StatefulWidget {
 
 class _MerchandiseScreenState extends State<MerchandiseScreen> {
   String selectedCategory = "All";
+  final List<CartItem> cart = [];
+
+  void addToCart(Merchandise product) {
+    setState(() {
+      final index = cart.indexWhere(
+        (item) => item.product.name == product.name,
+      );
+      if (index >= 0) {
+        cart[index].quantity++;
+      } else {
+        cart.add(CartItem(product: product));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +41,39 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
+        actions: [
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CartScreen(cart: cart),
+                    ),
+                  );
+                },
+              ),
+              if (cart.isNotEmpty)
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      "${cart.length}",
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
       extendBodyBehindAppBar: true,
       body: Container(
@@ -81,7 +130,10 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
                   ),
                   itemBuilder: (context, index) {
                     final item = filteredItems[index];
-                    return _buildMerchCard(item);
+                    return _buildMerchCard(
+                      context,
+                      item,
+                    ); 
                   },
                 ),
               ),
@@ -92,16 +144,23 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
     );
   }
 
-  Widget _buildMerchCard(Merchandise item) {
+  Widget _buildMerchCard(BuildContext context, Merchandise item) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => MerchandiseDetailScreen(item: item),
+            builder: (context) => MerchandiseDetailScreen(
+              item: item, 
+              onAddToCart: (merch) {
+                //
+                addToCart(merch);
+              },
+            ),
           ),
         );
       },
+
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 6,
@@ -137,10 +196,7 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
               const SizedBox(height: 8),
               const Text(
                 "Lihat Detail",
-                style: TextStyle(
-                  color: Color.fromARGB(255, 255, 255, 255),
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 12),
               ),
               const SizedBox(height: 8),
             ],
