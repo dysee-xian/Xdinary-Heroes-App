@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
+import 'screen/login.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -30,7 +31,6 @@ class _SplashScreenState extends State<SplashScreen>
       end: 1,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
-    // Animasi scale (zoom kecil → normal)
     _scaleAnimation = Tween<double>(
       begin: 0.6,
       end: 1,
@@ -102,6 +102,11 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                   const SizedBox(height: 8),
+                  LoadingAnimationWidget.discreteCircle(
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                  const SizedBox(height: 20),
                   const Text(
                     "Made by Desinta",
                     style: TextStyle(

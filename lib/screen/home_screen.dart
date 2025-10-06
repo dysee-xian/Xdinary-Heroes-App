@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'screen/merchandise_screen.dart';
-import 'screen/ProfileScreen.dart';
-import 'screen/post_feed_screen.dart';
-import 'screen/artist_list_screen.dart';
+import 'merchandise_screen.dart';
+import 'ProfileScreen.dart';
+import 'post_feed_screen.dart';
+import 'artist_list_screen.dart';
 
 class XdhFansScreen extends StatelessWidget {
   final String username;
