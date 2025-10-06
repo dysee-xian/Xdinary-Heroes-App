@@ -1,9 +1,9 @@
 class Merchandise {
-  String _name;
+  final String _name;
   int _price;
-  String _image;
-  String _category;
-  String _description;
+  final String _image;
+  final String _category;
+  final String _description;
 
   Merchandise(
     this._name,
