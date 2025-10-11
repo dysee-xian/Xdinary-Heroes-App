@@ -33,6 +33,7 @@ class XdhFansScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Length TabController tetap 5 sesuai TabBar di SliverAppBar (ARTIST, FAN, MEDIA, NOTICES, EVENTS)
     return DefaultTabController(
       length: 5,
       child: Scaffold(
@@ -78,7 +79,7 @@ class XdhFansScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 6),
 
-                              // PERUBAHAN UTAMA: Menggunakan FutureBuilder untuk menampilkan nama
+                              // Menampilkan Nama Pengguna dari Firestore
                               FutureBuilder<String>(
                                 future: fetchUserName(),
                                 builder: (context, snapshot) {
@@ -86,14 +87,11 @@ class XdhFansScreen extends StatelessWidget {
 
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                    // Tampilkan teks loading saat menunggu data
                                     greetingName = 'Loading...';
                                   } else if (snapshot.hasError) {
-                                    // Tampilkan pesan error jika gagal
                                     greetingName = 'Error';
                                   } else if (snapshot.connectionState ==
                                       ConnectionState.done) {
-                                    // Tampilkan nama yang berhasil diambil
                                     greetingName = snapshot.data ?? 'Villain';
                                   }
 
@@ -134,9 +132,9 @@ class XdhFansScreen extends StatelessWidget {
                   unselectedLabelColor: Colors.white70,
                   tabs: [
                     Tab(text: "ARTIST"),
-                    // Tab(text: "FAN"),
+                    Tab(text: "FAN"),
                     Tab(text: "MEDIA"),
-                    // Tab(text: "NOTICES"),
+                    Tab(text: "NOTICES"),
                     Tab(text: "EVENTS"),
                   ],
                 ),
@@ -171,38 +169,44 @@ class XdhFansScreen extends StatelessWidget {
 
         // Bottom Navigation
         bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.black,
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           selectedItemColor: Colors.deepPurple,
           unselectedItemColor: const Color.fromARGB(179, 56, 53, 53),
           onTap: (index) {
+            // Index: 0 = Home, 1 = Merchandise, 2 = Profile
             if (index == 1) {
+              // Merchandise (Index 1)
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const MerchandiseScreen(),
                 ),
               );
-            } else if (index == 3) {
+            } else if (index == 2) {
+              // PERBAIKAN: Profile sekarang di Index 2
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  // Pastikan ProfileScreen menerima parameter 'userId' atau 'userid'
                   builder: (context) => ProfileScreen(userid: userid),
                 ),
               );
             }
           },
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: "Home",
+            ), // Index 0
             BottomNavigationBarItem(
               icon: Icon(Icons.shopping_bag),
               label: "Merchandise",
-            ),
+            ), // Index 1
+
+            // Item 'Notices' dihapus dari sini
             BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
-              label: "Notices",
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+              icon: Icon(Icons.person),
+              label: "Profile",
+            ), // Index 2
           ],
         ),
       ),
