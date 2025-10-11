@@ -32,12 +32,15 @@ class _SignInScreenState extends State<SignInScreen> {
       );
 
       if (user != null) {
-        // Ekstrak nama dari email untuk ditampilkan
-        String username = _emailController.text.split('@')[0];
+        // Perbaikan: Gunakan UID dari objek User Firebase
+        String userUid = user.uid;
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => XdhFansScreen(username: username),
+            // Ganti passing username dengan userUid
+            // *Catatan: Asumsi XdhFansScreen menerima parameter ini dan meneruskannya*
+            builder: (context) => XdhFansScreen(username: userUid),
           ),
         );
       } else {
@@ -53,27 +56,7 @@ class _SignInScreenState extends State<SignInScreen> {
     }
   }
 
-  // Fungsi baru untuk menangani klik tombol Google
-  void _googleSignIn() async {
-    final user = await _authService.signInWithGoogle();
-    if (user != null) {
-      // Jika berhasil, ambil nama dari akun Google
-      String username = user.displayName ?? user.email!.split('@')[0];
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => XdhFansScreen(username: username),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Login dengan Google gagal. Coba lagi."),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
+  // Fungsi _googleSignIn dihapus
 
   @override
   Widget build(BuildContext context) {
@@ -177,45 +160,8 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                           child: const Text("Sign In"),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10.0),
-                          child: Row(
-                            children: [
-                              Expanded(child: Divider()),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Text("OR"),
-                              ),
-                              Expanded(child: Divider()),
-                            ],
-                          ),
-                        ),
 
-                        // Tombol Google Sign-In
-                        ElevatedButton(
-                          onPressed: _googleSignIn,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black87,
-                            minimumSize: const Size(double.infinity, 50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              side: BorderSide(color: Colors.grey.shade300),
-                            ),
-                            elevation: 2,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                'assets/image/google.png',
-                                width: 24,
-                              ), // Pastikan punya logo google
-                              const SizedBox(width: 12),
-                              const Text("Sign in with Google"),
-                            ],
-                          ),
-                        ),
+                        // Bagian Divider "OR" dan Tombol Google Sign-In telah dihapus
                         const Divider(height: 40),
                         TextButton(
                           onPressed: () {

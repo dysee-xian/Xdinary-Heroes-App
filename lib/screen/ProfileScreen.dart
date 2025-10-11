@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final String username; // ID user login
-  const ProfileScreen({super.key, required this.username});
+  final String userid;
+  const ProfileScreen({super.key, required this.userid});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -44,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserProfile() async {
     return await FirebaseFirestore.instance
         .collection('users')
-        .doc(widget.username)
+        .doc(widget.userid)
         .get();
   }
 

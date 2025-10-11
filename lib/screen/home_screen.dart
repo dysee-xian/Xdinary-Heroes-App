@@ -67,10 +67,7 @@ class XdhFansScreen extends StatelessWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: const [
-                                  Icon(
-                                    Icons.music_note,
-                                    color: Colors.white,
-                                  ),
+                                  Icon(Icons.music_note, color: Colors.white),
                                   SizedBox(width: 16),
                                   Icon(Icons.tiktok, color: Colors.white),
                                   SizedBox(width: 16),
@@ -144,7 +141,7 @@ class XdhFansScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProfileScreen(username: username),
+                  builder: (context) => ProfileScreen(userid: username),
                 ),
               );
             }
