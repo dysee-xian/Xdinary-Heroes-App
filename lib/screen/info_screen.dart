@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import '../models/merchandise.dart';
 import '../models/cart_item.dart';
 import 'cart_screen.dart';
+import 'package:badges/badges.dart' as badges;
 
 class MerchandiseDetailScreen extends StatelessWidget {
   final Merchandise item;
-  final Function(Merchandise) onAddToCart; // 🔹 callback untuk tambah ke cart
+  final Function(Merchandise) onAddToCart;
+  final List<CartItem> cart; // 🛍️ tambahin biar badge bisa tahu isi cart
 
   const MerchandiseDetailScreen({
     super.key,
     required this.item,
     required this.onAddToCart,
+    this.cart = const [], // default biar aman
   });
 
   @override
@@ -21,6 +24,31 @@ class MerchandiseDetailScreen extends StatelessWidget {
         title: Text(item.name),
         backgroundColor: const Color.fromARGB(255, 145, 139, 139),
         elevation: 0,
+        actions: [
+          badges.Badge(
+            position: badges.BadgePosition.topEnd(top: 3, end: 5),
+            showBadge: cart.isNotEmpty,
+            badgeContent: Text(
+              '${cart.length}',
+              style: const TextStyle(color: Colors.white, fontSize: 10),
+            ),
+            badgeStyle: const badges.BadgeStyle(
+              badgeColor: Colors.red,
+              padding: EdgeInsets.all(5),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CartScreen(cart: cart),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -39,20 +67,16 @@ class MerchandiseDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // 🔹 Gambar Produk
                 Expanded(
                   child: Hero(
                     tag: item.image,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: Image.asset(item.image, fit: BoxFit.contain),
+                      child: Image.network(item.image, fit: BoxFit.contain),
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
-                // 🔹 Nama Produk
                 Text(
                   item.name,
                   style: const TextStyle(
@@ -62,10 +86,7 @@ class MerchandiseDetailScreen extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-
                 const SizedBox(height: 10),
-
-                // 🔹 Harga
                 Text(
                   "Rp ${item.price}",
                   style: const TextStyle(
@@ -74,10 +95,7 @@ class MerchandiseDetailScreen extends StatelessWidget {
                     color: Color.fromARGB(255, 0, 0, 0),
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
-                // 🔹 Deskripsi
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -91,18 +109,13 @@ class MerchandiseDetailScreen extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
-                // 🔹 Tombol Aksi (Tambah & Beli Sekarang)
                 Row(
                   children: [
-                    // 👉 Tombol Tambah ke Keranjang
                     Expanded(
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 255, 255, 255),
+                          backgroundColor: Colors.white,
                           foregroundColor: Colors.black87,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -113,7 +126,7 @@ class MerchandiseDetailScreen extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          onAddToCart(item); // simpan ke keranjang
+                          onAddToCart(item);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -134,12 +147,15 @@ class MerchandiseDetailScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // 👉 Tombol Beli Sekarang
                     Expanded(
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 228, 225, 232),
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            228,
+                            225,
+                            232,
+                          ),
                           foregroundColor: Colors.black87,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -150,7 +166,7 @@ class MerchandiseDetailScreen extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          onAddToCart(item); // simpan ke keranjang
+                          onAddToCart(item);
                           Navigator.push(
                             context,
                             MaterialPageRoute(

@@ -1,109 +1,62 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Merchandise {
-  final String _name;
-  int _price;
-  final String _image;
-  final String _category;
-  final String _description;
+  final String name;
+  final int price;
+  final String image;
+  final String category;
+  final String description;
+  final String? id; 
+  
+  Merchandise({
+    required this.name,
+    required this.price,
+    required this.image,
+    required this.category,
+    required this.description,
+    this.id,
+  });
 
-  Merchandise(
-    this._name,
-    this._price,
-    this._image,
-    this._category,
-    this._description,
-  );
 
-  // Getter
-  String get name => _name;
-  int get price => _price;
-  String get image => _image;
-  String get category => _category;
-  String get description => _description;
+  // Factory untuk convert dari document firestore ke object Merchandise
+  factory Merchandise.fromDocument(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Merchandise(
+      id: doc.id,
+      name: data['name'] ?? '',
+      price: data['price'] ?? 0,
+      image: data['image'] ?? '',
+      category: data['category'] ?? '',
+      description: data['description'] ?? '',
+    );
+  }
 
-  // Setter
-  set price(int value) {
-    if (value > 0) {
-      _price = value;
-    }
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'price': price,
+      'image': image,
+      'category': category,
+      'description': description,
+    };
   }
 }
 
-final List<Merchandise> allItems = [
-  Merchandise(
-    "6st Mini Album Beautiful Mind Special ver",
-    200000,
-    "assets/image/beauifulmind.jpg",
-    "Album",
-    "6st Mini Album Special ver. This product is sold in limited quantities and may sell out early once the prepared stock is gone.",
-  ),
-  Merchandise(
-    "1st Full Album Trouble Shooting",
-    190000,
-    "assets/image/TroubleShooting.jpg",
-    "Album",
-    "Full Album pertama Xdinary Heroes dengan musik lebih energik dan eksperimental.",
-  ),
-  Merchandise(
-    "T-Shirt XDH",
-    120000,
-    "assets/image/tshirt.png",
-    "Baju",
-    "Kaos official XDH dengan desain logo eksklusif. Nyaman untuk aktivitas sehari-hari.",
-  ),
-  Merchandise(
-    "Hoodie XDH",
-    250000,
-    "assets/image/hoodie.png",
-    "Baju",
-    "Hoodie tebal dan hangat dengan desain khas XDH. Cocok untuk musim hujan.",
-  ),
-  Merchandise(
-    "Gantungan Kunci",
-    30000,
-    "assets/image/keychain.png",
-    "Aksesoris",
-    "Gantungan kunci karakter XDH. Ringan, lucu, dan bisa dipasang di tas atau kunci.",
-  ),
-  Merchandise(
-    "Ham-Il",
-    200000,
-    "assets/image/album.png",
-    "Monster",
-    "Boneka maskot Ham-Il, karakter imut dari XDH yang menjadi favorit fans.",
-  ),
-  Merchandise(
-    "Nyangduu",
-    190000,
-    "assets/image/album2.png",
-    "Monster",
-    "Boneka karakter Nyangduu dengan desain menggemaskan untuk koleksi.",
-  ),
-  Merchandise(
-    "JiDuck",
-    120000,
-    "assets/image/tshirt.png",
-    "Monster",
-    "Boneka karakter JiDuck berbentuk bebek unik. Wajib dimiliki oleh penggemar XDH.",
-  ),
-  Merchandise(
-    "Fox.De",
-    250000,
-    "assets/image/hoodie.png",
-    "Monster",
-    "Boneka rubah bernama Fox.De dengan desain elegan dan bulu lembut.",
-  ),
-  Merchandise(
-    "Tyonen",
-    180000,
-    "assets/image/doll.png",
-    "Monster",
-    "Boneka Tyonen dengan ekspresi ceria, cocok jadi teman tidur maupun pajangan.",
-  ),
-  Merchandise(
-    "Jjuf",
-    30000,
-    "assets/image/keychain.png",
-    "Monster",
-    "Mini boneka Jjuf yang mungil, bisa dijadikan gantungan kunci atau koleksi.",
-  ),
-];
+/// Service class untuk ambil data dari firestore
+class MerchandiseService {
+  final CollectionReference merchRef = FirebaseFirestore.instance.collection(
+    'merchandise',
+  );
+
+  Future<List<Merchandise>> getMerchandise() async {
+    final querySnapshot = await merchRef.get();
+    return querySnapshot.docs
+        .map((doc) => Merchandise.fromDocument(doc))
+        .toList();
+  }
+
+  // Tambahan kalau mau nambahin data ke Firestore
+  Future<void> addMerchandise(Merchandise item) async {
+    await merchRef.add(item.toMap());
+  }
+}

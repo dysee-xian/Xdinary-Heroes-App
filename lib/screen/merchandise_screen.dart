@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/merchandise.dart';
 import '../models/cart_item.dart';
 import 'cart_screen.dart';
 import 'info_screen.dart';
+import 'package:badges/badges.dart' as badges;
 
 class MerchandiseScreen extends StatefulWidget {
   const MerchandiseScreen({super.key});
@@ -30,10 +32,6 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredItems = selectedCategory == "All"
-        ? allItems
-        : allItems.where((item) => item.category == selectedCategory).toList();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Merchandise Store"),
@@ -42,36 +40,34 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
         elevation: 0,
         foregroundColor: Colors.white,
         actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.shopping_cart),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CartScreen(cart: cart),
-                    ),
-                  );
-                },
-              ),
-              if (cart.isNotEmpty)
-                Positioned(
-                  right: 6,
-                  top: 6,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      "${cart.length}",
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                    ),
+          badges.Badge(
+            position: badges.BadgePosition.topEnd(top: 3, end: 5),
+            showBadge: cart.isNotEmpty,
+            badgeContent: Text(
+              '${cart.length}',
+              style: const TextStyle(color: Colors.white, fontSize: 10),
+            ),
+            badgeStyle: const badges.BadgeStyle(
+              badgeColor: Colors.red,
+              padding: EdgeInsets.all(5),
+            ),
+            badgeAnimation: badges.BadgeAnimation.slide(
+              animationDuration: const Duration(seconds: 1),
+              colorChangeAnimationDuration: const Duration(seconds: 3),
+              loopAnimation: false,
+              curve: Curves.fastOutSlowIn,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CartScreen(cart: cart),
                   ),
-                ),
-            ],
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -117,23 +113,66 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
 
               const SizedBox(height: 10),
 
-              // 🔹 Grid produk
+              // 🔹 Ambil data dari Firestore
               Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filteredItems.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.75,
-                  ),
-                  itemBuilder: (context, index) {
-                    final item = filteredItems[index];
-                    return _buildMerchCard(
-                      context,
-                      item,
-                    ); 
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('merchandise') // 🔸 nama collection kamu
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      );
+                    }
+
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "Belum ada merchandise 😢",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
+                    }
+
+                    final docs = snapshot.data!.docs;
+
+                    // 🔸 convert dari firestore ke Merchandise model
+                    final items = docs.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      return Merchandise(
+                        name: data['name'] ?? '',
+                        price: data['price'] ?? 0,
+                        image: data['image'] ?? '',
+                        category: data['category'] ?? 'Uncategorized',
+                        description: data['description'] ?? '',
+                      );
+                    }).toList();
+
+                    // 🔸 filter berdasarkan kategori
+                    final filteredItems = selectedCategory == "All"
+                        ? items
+                        : items
+                              .where(
+                                (item) => item.category == selectedCategory,
+                              )
+                              .toList();
+
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: filteredItems.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.75,
+                          ),
+                      itemBuilder: (context, index) {
+                        final item = filteredItems[index];
+                        return _buildMerchCard(context, item);
+                      },
+                    );
                   },
                 ),
               ),
@@ -151,16 +190,12 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
           context,
           MaterialPageRoute(
             builder: (context) => MerchandiseDetailScreen(
-              item: item, 
-              onAddToCart: (merch) {
-                //
-                addToCart(merch);
-              },
+              item: item,
+              onAddToCart: (merch) => addToCart(merch),
             ),
           ),
         );
       },
-
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 6,
@@ -179,7 +214,29 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(child: Image.asset(item.image, fit: BoxFit.contain)),
+              Expanded(
+                child: item.image.startsWith('http')
+                    ? Image.network(
+                        item.image,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.broken_image,
+                            color: Colors.white,
+                            size: 50,
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          );
+                        },
+                      )
+                    : Image.asset(item.image, fit: BoxFit.contain),
+              ),
               const SizedBox(height: 8),
               Text(
                 item.name,

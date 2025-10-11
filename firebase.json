@@ -1,1 +1,25 @@
-{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"dbxdinaryapp","configurations":{"web":"1:730210109067:web:9547fcd62a42d7f20ab68e"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "dbxdinaryapp",
+          "configurations": {
+            "web": "1:730210109067:web:9547fcd62a42d7f20ab68e"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "asia-east1"
+    }
+  }
+}

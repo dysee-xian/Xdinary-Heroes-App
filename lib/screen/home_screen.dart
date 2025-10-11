@@ -6,7 +6,6 @@ import 'artist_list_screen.dart';
 
 class XdhFansScreen extends StatelessWidget {
   final String username;
-
   const XdhFansScreen({super.key, required this.username});
 
   @override
@@ -69,11 +68,11 @@ class XdhFansScreen extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: const [
                                   Icon(
-                                    Icons.play_circle_fill,
+                                    Icons.music_note,
                                     color: Colors.white,
                                   ),
                                   SizedBox(width: 16),
-                                  Icon(Icons.camera_alt, color: Colors.white),
+                                  Icon(Icons.tiktok, color: Colors.white),
                                   SizedBox(width: 16),
                                   Icon(Icons.facebook, color: Colors.white),
                                   SizedBox(width: 16),
@@ -144,7 +143,9 @@ class XdhFansScreen extends StatelessWidget {
             } else if (index == 3) {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(username: username),
+                ),
               );
             }
           },

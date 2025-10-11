@@ -1,7 +1,9 @@
-import 'package.flutter/foundation.dart'; // Import untuk kIsWeb
+import 'package.flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // File hasil generate FlutterFire CLI
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firebase_options.dart';
 import 'splash.dart';
 
 void main() async {
