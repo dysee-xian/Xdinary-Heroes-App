@@ -40,7 +40,7 @@ class _SignInScreenState extends State<SignInScreen> {
           MaterialPageRoute(
             // Ganti passing username dengan userUid
             // *Catatan: Asumsi XdhFansScreen menerima parameter ini dan meneruskannya*
-            builder: (context) => XdhFansScreen(username: userUid),
+            builder: (context) => XdhFansScreen(userid: userUid),
           ),
         );
       } else {

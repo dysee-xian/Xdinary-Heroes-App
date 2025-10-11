@@ -54,6 +54,20 @@ class AuthService {
       return null;
     }
   }
-
-  // Metode signInWithGoogle telah dihapus
+   Future<void> updateUserData({
+    required String uid,
+    String? name,
+    String? bio,
+    String? profileImage, // Opsional jika nanti ada fitur ganti foto
+  }) async {
+    Map<String, dynamic> updates = {};
+    if (name != null) updates['name'] = name;
+    if (bio != null) updates['bio'] = bio;
+    if (profileImage != null) updates['profileImage'] = profileImage;
+    
+    // Hanya lakukan update jika ada perubahan
+    if (updates.isNotEmpty) {
+      await _firestore.collection('users').doc(uid).update(updates);
+    }
+  }
 }

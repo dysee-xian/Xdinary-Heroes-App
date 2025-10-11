@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
+import 'edit_profile_screen.dart'; // Pastikan file ini sudah ada
 
 class ProfileScreen extends StatefulWidget {
-  final String userid;
+  final String userid; // Ini adalah UID pengguna
   const ProfileScreen({super.key, required this.userid});
 
   @override
@@ -38,6 +39,30 @@ class _ProfileScreenState extends State<ProfileScreen>
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  // Fungsi BARU: Navigasi ke EditProfileScreen dan menunggu hasil kembali
+  void _navigateToEditProfile(
+    String uid,
+    String name,
+    String email,
+    String bio,
+    String imageUrl,
+  ) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfileScreen(
+          userId: uid,
+          currentName: name,
+          currentEmail: email,
+          currentBio: bio,
+          currentProfileImage: imageUrl,
+        ),
+      ),
+    );
+    // Memicu refresh FutureBuilder untuk memuat data profil yang diperbarui
+    setState(() {});
   }
 
   // 🔹 Ambil data user dari Firestore
@@ -190,13 +215,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   ),
                                   elevation: 5,
                                 ),
+                                // PERUBAHAN: Memanggil fungsi navigasi
                                 onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        "Edit Profile belum dibuat",
-                                      ),
-                                    ),
+                                  _navigateToEditProfile(
+                                    widget.userid, // UID pengguna
+                                    name,
+                                    email,
+                                    bio,
+                                    imageUrl,
                                   );
                                 },
                                 icon: const Icon(Icons.edit),

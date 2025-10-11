@@ -1,12 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Wajib: Import Firestore
 import 'merchandise_screen.dart';
 import 'ProfileScreen.dart';
 import 'post_feed_screen.dart';
 import 'artist_list_screen.dart';
 
 class XdhFansScreen extends StatelessWidget {
-  final String username;
-  const XdhFansScreen({super.key, required this.username});
+  final String userid;
+  const XdhFansScreen({super.key, required this.userid});
+
+  // Fungsi baru: Mengambil nama pengguna dari Firestore menggunakan UID
+  Future<String> fetchUserName() async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userid) // Menggunakan UID untuk mencari dokumen
+          .get();
+
+      if (userDoc.exists && userDoc.data() != null) {
+        // Mengambil field 'name' yang disimpan saat registrasi
+        final data = userDoc.data() as Map<String, dynamic>;
+        return data['name'] ??
+            'Villain'; // Mengembalikan nama, atau 'Villain' sebagai default
+      } else {
+        return 'Villain (Not Found)';
+      }
+    } catch (e) {
+      print("Error fetching user name: $e");
+      return 'Error Loading Name';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,13 +77,35 @@ class XdhFansScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 6),
-                              Text(
-                                "Hello, $username 👋",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white70,
-                                ),
+
+                              // PERUBAHAN UTAMA: Menggunakan FutureBuilder untuk menampilkan nama
+                              FutureBuilder<String>(
+                                future: fetchUserName(),
+                                builder: (context, snapshot) {
+                                  String greetingName = 'Loading...';
+
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    // Tampilkan teks loading saat menunggu data
+                                    greetingName = 'Loading...';
+                                  } else if (snapshot.hasError) {
+                                    // Tampilkan pesan error jika gagal
+                                    greetingName = 'Error';
+                                  } else if (snapshot.connectionState ==
+                                      ConnectionState.done) {
+                                    // Tampilkan nama yang berhasil diambil
+                                    greetingName = snapshot.data ?? 'Villain';
+                                  }
+
+                                  return Text(
+                                    "Hello, $greetingName 👋", // Menampilkan nama asli
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.white70,
+                                    ),
+                                  );
+                                },
                               ),
 
                               const SizedBox(height: 12),
@@ -89,9 +134,9 @@ class XdhFansScreen extends StatelessWidget {
                   unselectedLabelColor: Colors.white70,
                   tabs: [
                     Tab(text: "ARTIST"),
-                    Tab(text: "FAN"),
+                    // Tab(text: "FAN"),
                     Tab(text: "MEDIA"),
-                    Tab(text: "NOTICES"),
+                    // Tab(text: "NOTICES"),
                     Tab(text: "EVENTS"),
                   ],
                 ),
@@ -141,7 +186,8 @@ class XdhFansScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProfileScreen(userid: username),
+                  // Pastikan ProfileScreen menerima parameter 'userId' atau 'userid'
+                  builder: (context) => ProfileScreen(userid: userid),
                 ),
               );
             }
