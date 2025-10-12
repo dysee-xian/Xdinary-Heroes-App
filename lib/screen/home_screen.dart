@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import '../data/event_data.dart'; // Import data event
+import '../models/event.dart'; // Import model event
 import 'merchandise_screen.dart';
 import 'ProfileScreen.dart';
 import 'artist_list_screen.dart';
@@ -8,19 +11,28 @@ class XdhFansScreen extends StatelessWidget {
   final String userid;
   const XdhFansScreen({super.key, required this.userid});
 
-  // Fungsi baru: Mengambil nama pengguna dari Firestore menggunakan UID
+  final List<String> imageList = const [
+    'assets/image/TroubleShooting.jpg',
+    'assets/image/beauifulmind.jpg',
+    'assets/image/ode.jpg',
+    'assets/image/gunil.jpg',
+    'assets/image/Jungsu.jpg',
+    'assets/image/gaon.jpg',
+    'assets/image/JOOYEON.jpg',
+    'assets/image/Junhan.jpg',
+    'assets/image/depan.png',
+  ];
+
   Future<String> fetchUserName() async {
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(userid) // Menggunakan UID untuk mencari dokumen
+          .doc(userid)
           .get();
 
       if (userDoc.exists && userDoc.data() != null) {
-        // Mengambil field 'name' yang disimpan saat registrasi
         final data = userDoc.data() as Map<String, dynamic>;
-        return data['name'] ??
-            'Villain'; // Mengembalikan nama, atau 'Villain' sebagai default
+        return data['name'] ?? 'Villain';
       } else {
         return 'Villain (Not Found)';
       }
@@ -32,9 +44,8 @@ class XdhFansScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Length TabController tetap 5 sesuai TabBar di SliverAppBar (ARTIST, FAN, MEDIA, NOTICES, EVENTS)
     return DefaultTabController(
-      length: 5,
+      length: 3,
       child: Scaffold(
         backgroundColor: Colors.black,
         body: NestedScrollView(
@@ -77,13 +88,10 @@ class XdhFansScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 6),
-
-                              // Menampilkan Nama Pengguna dari Firestore
                               FutureBuilder<String>(
                                 future: fetchUserName(),
                                 builder: (context, snapshot) {
                                   String greetingName = 'Loading...';
-
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     greetingName = 'Loading...';
@@ -93,9 +101,8 @@ class XdhFansScreen extends StatelessWidget {
                                       ConnectionState.done) {
                                     greetingName = snapshot.data ?? 'Villain';
                                   }
-
                                   return Text(
-                                    "Hello, $greetingName 👋", // Menampilkan nama asli
+                                    "Hello, $greetingName 👋",
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -104,7 +111,6 @@ class XdhFansScreen extends StatelessWidget {
                                   );
                                 },
                               ),
-
                               const SizedBox(height: 12),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -138,34 +144,97 @@ class XdhFansScreen extends StatelessWidget {
               ),
             ];
           },
-          body: const TabBarView(
+          body: TabBarView(
             children: [
-              ArtistListScreen(),
-              Center(
-                child: Text(
-                  "Media Page",
-                  style: TextStyle(color: Colors.white),
+              const ArtistListScreen(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: MasonryGridView.builder(
+                  itemCount: imageList.length,
+                  gridDelegate:
+                      const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                      ),
+                  itemBuilder: (context, index) => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(imageList[index], fit: BoxFit.cover),
+                    ),
+                  ),
                 ),
               ),
-              Center(
-                child: Text(
-                  "Events Page",
-                  style: TextStyle(color: Colors.white),
-                ),
+              // ## MODIFIKASI: Tampilkan daftar event di sini ##
+              ListView.builder(
+                itemCount: dummyEvents.length,
+                itemBuilder: (context, index) {
+                  final event = dummyEvents[index];
+                  return Card(
+                    color: Colors.grey[900],
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.asset(
+                              event.imageUrl,
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  event.title,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  event.date,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  event.location,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
         ),
-
-        // Bottom Navigation
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           selectedItemColor: Colors.deepPurple,
           unselectedItemColor: const Color.fromARGB(179, 56, 53, 53),
           onTap: (index) {
-            // Index: 0 = Home, 1 = Merchandise, 2 = Profile
             if (index == 1) {
-              // Merchandise (Index 1)
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -173,7 +242,6 @@ class XdhFansScreen extends StatelessWidget {
                 ),
               );
             } else if (index == 2) {
-              // PERBAIKAN: Profile sekarang di Index 2
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -183,19 +251,12 @@ class XdhFansScreen extends StatelessWidget {
             }
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Home",
-            ), // Index 0
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
             BottomNavigationBarItem(
               icon: Icon(Icons.shopping_bag),
               label: "Merchandise",
-            ), // Index 1
-            // Item 'Notices' dihapus dari sini
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: "Profile",
-            ), // Index 2
+            ),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
           ],
         ),
       ),
