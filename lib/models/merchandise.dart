@@ -4,19 +4,20 @@ class Merchandise {
   final String name;
   final int price;
   final String image;
+  final String? image2;
   final String category;
   final String description;
-  final String? id; 
-  
+  final String? id;
+
   Merchandise({
     required this.name,
     required this.price,
     required this.image,
+    this.image2,
     required this.category,
     required this.description,
     this.id,
   });
-
 
   // Factory untuk convert dari document firestore ke object Merchandise
   factory Merchandise.fromDocument(DocumentSnapshot doc) {
@@ -26,6 +27,7 @@ class Merchandise {
       name: data['name'] ?? '',
       price: data['price'] ?? 0,
       image: data['image'] ?? '',
+      image2: data['image2'] ?? '',
       category: data['category'] ?? '',
       description: data['description'] ?? '',
     );

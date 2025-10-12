@@ -144,6 +144,7 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
                         name: data['name'] ?? '',
                         price: data['price'] ?? 0,
                         image: data['image'] ?? '',
+                        image2: data['image2'] ?? '',
                         category: data['category'] ?? 'Uncategorized',
                         description: data['description'] ?? '',
                       );

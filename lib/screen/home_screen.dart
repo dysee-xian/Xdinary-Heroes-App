@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Wajib: Import Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'merchandise_screen.dart';
 import 'ProfileScreen.dart';
-import 'post_feed_screen.dart';
 import 'artist_list_screen.dart';
 
 class XdhFansScreen extends StatelessWidget {
@@ -132,9 +131,7 @@ class XdhFansScreen extends StatelessWidget {
                   unselectedLabelColor: Colors.white70,
                   tabs: [
                     Tab(text: "ARTIST"),
-                    Tab(text: "FAN"),
                     Tab(text: "MEDIA"),
-                    Tab(text: "NOTICES"),
                     Tab(text: "EVENTS"),
                   ],
                 ),
@@ -144,16 +141,9 @@ class XdhFansScreen extends StatelessWidget {
           body: const TabBarView(
             children: [
               ArtistListScreen(),
-              PostFeedScreen(),
               Center(
                 child: Text(
                   "Media Page",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              Center(
-                child: Text(
-                  "Notices Page",
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -201,7 +191,6 @@ class XdhFansScreen extends StatelessWidget {
               icon: Icon(Icons.shopping_bag),
               label: "Merchandise",
             ), // Index 1
-
             // Item 'Notices' dihapus dari sini
             BottomNavigationBarItem(
               icon: Icon(Icons.person),

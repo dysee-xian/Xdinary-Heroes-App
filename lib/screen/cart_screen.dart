@@ -36,7 +36,7 @@ class _CartScreenState extends State<CartScreen> {
               itemBuilder: (context, index) {
                 final cartItem = widget.cart[index];
                 return ListTile(
-                  leading: Image.asset(
+                  leading: Image.network(
                     cartItem.product.image,
                     width: 50,
                     height: 50,

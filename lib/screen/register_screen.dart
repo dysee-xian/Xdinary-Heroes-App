@@ -15,6 +15,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
 
+  bool _obscurePassword = true;
+
   void _register() async {
     if (_formKey.currentState!.validate()) {
       final user = await _authService.registerWithEmailAndPassword(
@@ -48,7 +50,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        // ... (Gunakan dekorasi gradient yang sama seperti sebelumnya)
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -72,9 +73,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Text(
                     "Create Account",
                     style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 30),
                   TextFormField(
@@ -82,7 +83,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                       hintText: 'Email',
                       prefixIcon: const Icon(Icons.email_outlined),
-                      // ... (style input field yang sama)
                       filled: true,
                       fillColor: Colors.grey[100],
                       border: OutlineInputBorder(
@@ -90,24 +90,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    validator: (value) => value!.isEmpty ? "Masukkan email" : null,
+                    validator: (value) =>
+                        value!.isEmpty ? "Masukkan email" : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
-                    obscureText: true,
+                    obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       hintText: 'Password',
                       prefixIcon: const Icon(Icons.lock_outline),
-                      // ... (style input field yang sama)
                       filled: true,
                       fillColor: Colors.grey[100],
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(50),
                         borderSide: BorderSide.none,
                       ),
+
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
                     ),
-                    validator: (value) => value!.length < 6 ? "Password minimal 6 karakter" : null,
+                    validator: (value) => value!.length < 6
+                        ? "Password minimal 6 karakter"
+                        : null,
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
