@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import '../data/event_data.dart'; // Import data event
-import '../models/event.dart'; // Import model event
+import 'package:url_launcher/url_launcher.dart';
+import '../data/event_data.dart';
+import '../models/event.dart';
 import 'merchandise_screen.dart';
 import 'ProfileScreen.dart';
 import 'artist_list_screen.dart';
@@ -12,8 +13,6 @@ class XdhFansScreen extends StatelessWidget {
   const XdhFansScreen({super.key, required this.userid});
 
   final List<String> imageList = const [
-    'assets/image/TroubleShooting.jpg',
-    'assets/image/beauifulmind.jpg',
     'assets/image/ode.jpg',
     'assets/image/gunil.jpg',
     'assets/image/Jungsu.jpg',
@@ -21,7 +20,24 @@ class XdhFansScreen extends StatelessWidget {
     'assets/image/JOOYEON.jpg',
     'assets/image/Junhan.jpg',
     'assets/image/depan.png',
+    'https://i.imgur.com/1Zhpdtd.jpeg',
+    'https://i.imgur.com/ApSfRom.jpeg',
+    'https://i.imgur.com/acD9lTb.jpeg',
+    'https://i.imgur.com/EM7DO4b.jpeg',
+    'https://i.imgur.com/mpJOW5x.jpeg',
+    'https://i.imgur.com/aLAeK57.jpeg',
+    'https://i.imgur.com/RhSkFUb.jpeg',
+    'https://i.imgur.com/x5F3dpK.jpeg',
+    'https://i.imgur.com/Nlq2fXm.jpeg',
+    'https://i.imgur.com/OkPStek.jpeg',
   ];
+
+  void _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw 'Tidak dapat membuka $url';
+    }
+  }
 
   Future<String> fetchUserName() async {
     try {
@@ -112,16 +128,45 @@ class XdhFansScreen extends StatelessWidget {
                                 },
                               ),
                               const SizedBox(height: 12),
+
+                              // 🌐 Ikon Sosial Media
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  Icon(Icons.music_note, color: Colors.white),
-                                  SizedBox(width: 16),
-                                  Icon(Icons.tiktok, color: Colors.white),
-                                  SizedBox(width: 16),
-                                  Icon(Icons.facebook, color: Colors.white),
-                                  SizedBox(width: 16),
-                                  Icon(Icons.more_horiz, color: Colors.white),
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.play_circle_fill,
+                                      color: Colors.white,
+                                    ),
+                                    iconSize: 25,
+                                    onPressed: () {
+                                      _launchURL(
+                                        'https://youtu.be/_L7wVbtpgm8?si=0vrYsBAbsWO2Lqkg',
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(width: 16),
+                                  IconButton(
+                                    icon: const Icon(Icons.music_note),
+                                    iconSize: 25,
+                                    color: Colors.white,
+                                    onPressed: () {
+                                      _launchURL(
+                                        'https://spotify.link/Pv3hPUbjtXb',
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(width: 16),
+                                  IconButton(
+                                    icon: const Icon(Icons.tiktok),
+                                    iconSize: 25,
+                                    color: Colors.white,
+                                    onPressed: () {
+                                      _launchURL(
+                                        'https://www.tiktok.com/@xheroes_official?_t=ZS-90YWRNEqAaL&_r=1',
+                                      );
+                                    },
+                                  ),
                                 ],
                               ),
                             ],
@@ -155,16 +200,41 @@ class XdhFansScreen extends StatelessWidget {
                       const SliverSimpleGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                       ),
-                  itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(imageList[index], fit: BoxFit.cover),
-                    ),
-                  ),
+                  itemBuilder: (context, index) {
+                    final imagePath = imageList[index];
+                    final isNetwork = imagePath.startsWith('http');
+
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: isNetwork
+                            ? Image.network(
+                                imagePath,
+                                fit: BoxFit.cover,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Center(
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      color: Colors.white54,
+                                    ),
+                                  );
+                                },
+                              )
+                            : Image.asset(imagePath, fit: BoxFit.cover),
+                      ),
+                    );
+                  },
                 ),
               ),
-              // ## MODIFIKASI: Tampilkan daftar event di sini ##
+              // 📅 EVENT LIST
               ListView.builder(
                 itemCount: dummyEvents.length,
                 itemBuilder: (context, index) {

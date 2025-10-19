@@ -129,7 +129,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ],
                   ),
 
-                  // 🔹 Foto + Nama
                   FadeTransition(
                     opacity: _fadeAnimation,
                     child: Container(
@@ -143,7 +142,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                             radius: 60,
                             backgroundImage: imageUrl.isNotEmpty
                                 ? NetworkImage(imageUrl)
-                                : const AssetImage('assets/image/default.png')
+                                : const NetworkImage(
+                                        'https://i.imgur.com/wX9qD63.jpeg',
+                                      )
                                       as ImageProvider,
                           ),
                           const SizedBox(height: 16),
