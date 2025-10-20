@@ -25,7 +25,7 @@ class ArtistDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 20),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.deepPurple, Colors.black],
+                  colors: [Color.fromARGB(255, 0, 0, 0), Colors.black],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
